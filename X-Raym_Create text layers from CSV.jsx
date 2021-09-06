@@ -20,7 +20,7 @@
  * - Change columns ID based on your CSV 
 **/
 
-scriptName = "Create text layers from CSV";
+var scriptName = "Create text layers from CSV";
 
 {
 
