@@ -4,11 +4,13 @@
  * Author URI: https://www.extremraym.com
  * Repository: Gist > X-Raym
  * Licence: GPL v3
- * Version: 1.0
+ * Version: 1.0.1
  **/
 
 /**
  * Changelog:
+ * v1.0 (2021-09-07)
+  # file close fix
  * v1.0 (2021-09-06)
   + Initial Release
 **/
@@ -23,18 +25,16 @@
     
     var scriptName = "Create text layers from CSV";
 
-    // create undo group
-
+    // Create undo group
     app.beginUndoGroup("Create Text Layers From File");
 
     // Prompt user to select text file
-
     var myFile = File.openDialog();
     if (myFile != null && myFile.open("r")) {
 
-        // open file
+        // Read file
         var content = myFile.read();
-        file.close();
+        myFile.close();
 
         if (content) {
             var activeItem = app.project.activeItem;
@@ -45,16 +45,14 @@
                 var activeComp = activeItem;
 
                 var lines = content.split('\n');
-                for (var i = 1; i < lines.length; i++) { // 1 is for header
-                    var columns = lines[i].split('\t');
-                    if (columns.length >= 6) {
-                        var layer = activeComp.layers.addText(columns[6].replace(/"/g, ''));
+                for (var i = 1; i < lines.length; i++) { // 1 is for header line
+                    var columns = lines[i].split('\t'); // CSV Separator
+                    if (columns.length >= 6) { // The number of columns of the CSV
+                        var layer = activeComp.layers.addText(columns[6].replace(/"/g, '')); // remove quotes
                         layer.inPoint = columns[2];
                         layer.outPoint = columns[3];
                     }
                 }
-
-                // close the file before exiting
             }
         } else {
             alert("File open failed!");
