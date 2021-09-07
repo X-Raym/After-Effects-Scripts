@@ -2,14 +2,15 @@
  * AEScript Name: Create Text Layers from CSV
  * Author: X-Raym
  * Author URI: https://www.extremraym.com
- * Repository: Gist > X-Raym
+ * Repository: Gist > X-Raym > Create Text Layers from CSV - After Effects Script
  * Licence: GPL v3
  * Version: 1.0.1
+ * About: Based on https://www.motionscript.com/ae-scripting/create-text-layers-from-file.html
  **/
 
 /**
  * Changelog:
- * v1.0 (2021-09-07)
+ * v1.0.1 (2021-09-07)
   # file close fix
  * v1.0 (2021-09-06)
   + Initial Release
