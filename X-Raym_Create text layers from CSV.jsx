@@ -3,13 +3,16 @@
  * Author: X-Raym
  * Author URI: https://www.extremraym.com
  * Repository: Gist > X-Raym > Create Text Layers from CSV - After Effects Script
+ * Repository URI: https://gist.github.com/X-Raym/74a02b579233bdf8f9c4fa07db210e05
  * Licence: GPL v3
- * Version: 1.1
+ * Version: 1.2
  * About: Based on https://www.motionscript.com/ae-scripting/create-text-layers-from-file.html
  **/
 
 /**
  * Changelog:
+ * v1.2 (2023-09-06)
+  # Refactorisation
  * v1.1 (2023-09-06)
   + Add Comp Markers
   # convert <br> in names to breaklines
@@ -29,48 +32,49 @@
 
   var scriptName = "Create text layers from CSV";
 
+  // Prompt user to select text file
+  var myFile = File.openDialog();
+  if (myFile == null && ! myFile.open("r")) {
+    alert("No text file selected.");
+    return;
+  }
+
+  // Read file
+  var content = myFile.read();
+  myFile.close();
+
+  if (! content) {
+    alert("File open failed!");
+    return;
+  }
+
+  // Get Comp
+  var activeItem = app.project.activeItem;
+  if (activeItem == null || !activeItem instanceof CompItem) {
+    alert("Please select or open a composition first.", scriptName);
+    return;
+  }
+  var activeComp = activeItem;
+
   // Create undo group
   app.beginUndoGroup("Create Text Layers From File");
 
-  // Prompt user to select text file
-  var myFile = File.openDialog();
-  if (myFile != null && myFile.open("r")) {
-
-      // Read file
-      var content = myFile.read();
-      myFile.close();
-
-      if (content) {
-          var activeItem = app.project.activeItem;
-          if ((activeItem == null) || !(activeItem instanceof CompItem)) {
-              alert("Please select or open a composition first.", scriptName);
-          } else {
-
-              var activeComp = activeItem;
-
-              var lines = content.split('\n');
-              for (var i = 1; i < lines.length; i++) { // 1 is for header line
-                  var columns = lines[i].split('\t'); // CSV Separator
-                  if (columns.length >= 6) { // The number of columns of the CSV
-                      var text = columns[6].replace(/"/g, '').replace(/<br>/g, '\n'); // remove quotes / convert break lines
-                      // Add Text Layer
-                      var layer = activeComp.layers.addText(text);
-                      layer.inPoint = columns[2];
-                      layer.outPoint = columns[3];
-                      // Add Comp Marker
-                      var myMarker = new MarkerValue(text);
-                      myMarker.duration = columns[3] - columns[2];
-                      activeComp.markerProperty.setValueAtTime(columns[2], myMarker);
-                  }
-              }
-          }
-      } else {
-          alert("File open failed!");
-      }
-
-  } else {
-      alert("No text file selected.");
+  // Loop Lines
+  var lines = content.split('\n');
+  for (var i = 1; i < lines.length; i++) { // 0 is header line
+    var columns = lines[i].split('\t'); // CSV Separator
+    if (columns.length >= 6) { // The number of columns in the CSV
+      var text = columns[6].replace(/"/g, '').replace(/<br>/g, '\n'); // remove quotes / convert break lines
+      // Add Text Layer
+      var layer = activeComp.layers.addText(text);
+      layer.inPoint = columns[2];
+      layer.outPoint = columns[3];
+      // Add Comp Marker
+      var myMarker = new MarkerValue(text);
+      myMarker.duration = columns[3] - columns[2];
+      activeComp.markerProperty.setValueAtTime(columns[2], myMarker);
+    }
   }
-
   app.endUndoGroup();
+
 }
