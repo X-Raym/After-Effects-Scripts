@@ -42,7 +42,6 @@
   // Read file
   var content = myFile.read();
   myFile.close();
-
   if (! content) {
     alert("File open failed!");
     return;
